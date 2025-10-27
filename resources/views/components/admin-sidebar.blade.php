@@ -53,11 +53,36 @@
         </div>
     </div>
 
+    <!-- STATISTIK DIPINDAHKAN KE SINI - Setelah User Info, Sebelum Navigation -->
+    <div class="relative px-4 pt-4 pb-2 animate-slide-up" style="animation-delay: 0.4s;">
+        <div class="grid grid-cols-2 gap-3">
+            <!-- Total Projects -->
+            <div class="bg-white/10 backdrop-blur-xl rounded-lg p-3 border border-white/20 transform transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:bg-white/15 hover:-translate-y-2 animate-bounce-in" style="animation-delay: 0.5s;">
+                <p class="text-2xl font-bold text-white drop-shadow-lg animate-count-up">{{ \App\Models\Project::count() }}</p>
+                <p class="text-xs text-indigo-100 font-medium mt-1">Total Proyek</p>
+                <div class="mt-2 flex items-center text-green-300 text-xs animate-fade-in" style="animation-delay: 0.7s;">
+                    <i class="fas fa-arrow-up mr-1 animate-bounce-subtle"></i>
+                    <span>Active</span>
+                </div>
+            </div>
+
+            <!-- Total Users -->
+            <div class="bg-white/10 backdrop-blur-xl rounded-lg p-3 border border-white/20 transform transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:bg-white/15 hover:-translate-y-2 animate-bounce-in" style="animation-delay: 0.6s;">
+                <p class="text-2xl font-bold text-white drop-shadow-lg animate-count-up">{{ \App\Models\User::count() }}</p>
+                <p class="text-xs text-indigo-100 font-medium mt-1">Total User</p>
+                <div class="mt-2 flex items-center text-green-300 text-xs animate-fade-in" style="animation-delay: 0.8s;">
+                    <i class="fas fa-user-check mr-1 animate-bounce-subtle"></i>
+                    <span>Online</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation Menu with staggered animations -->
     <nav class="relative flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
         <ul class="space-y-1.5">
             <!-- Dashboard -->
-            <li class="group animate-slide-right" style="animation-delay: 0.1s;">
+            <li class="group animate-slide-right" style="animation-delay: 0.9s;">
                 <a href="{{ route('admin.dashboard') }}"
                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-500 relative overflow-hidden
                           {{ request()->routeIs('admin.dashboard')
@@ -73,7 +98,7 @@
             </li>
 
             <!-- Projects -->
-            <li class="group animate-slide-right" style="animation-delay: 0.2s;">
+            <li class="group animate-slide-right" style="animation-delay: 1s;">
                 <a href="{{ route('admin.projects.index') }}"
                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-500 relative overflow-hidden
                           {{ request()->routeIs('admin.projects.*')
@@ -88,18 +113,18 @@
                 </a>
             </li>
 
-            <!-- Manajemen Proyek -->
-            <li class="group animate-slide-right" style="animation-delay: 0.3s;">
+            {{--  <!-- Manajemen Proyek -->
+            <li class="group animate-slide-right" style="animation-delay: 1.1s;">
                 <a href="{{ route('admin.projects.index') }}"
                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-500 relative overflow-hidden
                           text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-2 hover:shadow-lg backdrop-blur-sm">
                     <i class="fas fa-project-diagram text-lg w-5 text-center transition-all duration-500 group-hover:scale-125 group-hover:rotate-180"></i>
                     <span class="font-medium">Manajemen Proyek</span>
                 </a>
-            </li>
+            </li>  --}}
 
             <!-- Monitoring -->
-            <li class="group animate-slide-right" style="animation-delay: 0.4s;">
+            <li class="group animate-slide-right" style="animation-delay: 1.1s;">
                 <a href="{{ route('admin.monitoring.index') }}"
                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-500 relative overflow-hidden
                           {{ request()->routeIs('admin.monitoring.*')
@@ -114,15 +139,15 @@
                 </a>
             </li>
 
-            <!-- Manajemen User -->
-            <li class="group animate-slide-right" style="animation-delay: 0.5s;">
+            <!-- User -->
+            <li class="group animate-slide-right" style="animation-delay: 1.2s;">
                 <a href="{{ route('admin.users.index') }}"
                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-500 relative overflow-hidden
                           {{ request()->routeIs('admin.users.*')
                              ? 'bg-white/20 backdrop-blur-xl text-white shadow-lg border border-white/30 scale-105'
                              : 'text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-2 hover:shadow-lg backdrop-blur-sm' }}">
                     <i class="fas fa-users text-lg w-5 text-center transition-all duration-500 group-hover:scale-125"></i>
-                    <span class="font-medium">Manajemen User</span>
+                    <span class="font-medium">Users</span>
                     @if(request()->routeIs('admin.users.*'))
                         <span class="absolute right-2 w-2 h-2 bg-white rounded-full animate-ping"></span>
                         <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></span>
@@ -131,7 +156,7 @@
             </li>
 
             <!-- Reports -->
-            <li class="group animate-slide-right" style="animation-delay: 0.6s;">
+            <li class="group animate-slide-right" style="animation-delay: 1.3s;">
                 <a href="#"
                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-500 relative overflow-hidden
                           text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-2 hover:shadow-lg backdrop-blur-sm">
@@ -141,12 +166,12 @@
             </li>
 
             <!-- Separator -->
-            <li class="py-3 animate-fade-in" style="animation-delay: 0.7s;">
+            <li class="py-3 animate-fade-in" style="animation-delay: 1.4s;">
                 <div class="border-t border-white/20 animate-expand"></div>
             </li>
 
             <!-- Settings -->
-            <li class="group animate-slide-right" style="animation-delay: 0.8s;">
+            <li class="group animate-slide-right" style="animation-delay: 1.5s;">
                 <a href="#"
                    class="flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-500 relative overflow-hidden
                           text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-2 hover:shadow-lg backdrop-blur-sm">
@@ -156,7 +181,7 @@
             </li>
 
             <!-- Logout -->
-            <li class="group animate-slide-right" style="animation-delay: 0.9s;">
+            <li class="group animate-slide-right" style="animation-delay: 1.6s;">
                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
                     <button type="submit"
@@ -170,26 +195,9 @@
         </ul>
     </nav>
 
-    <!-- Quick Stats - Sticky Bottom with bounce animation -->
-    <div class="relative p-4 border-t border-white/20 bg-white/5 backdrop-blur-xl animate-slide-up">
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bg-white/10 backdrop-blur-xl rounded-lg p-3 border border-white/20 transform transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:bg-white/15 hover:-translate-y-2 animate-bounce-in" style="animation-delay: 1s;">
-                <p class="text-2xl font-bold text-white drop-shadow-lg animate-count-up">{{ \App\Models\Project::count() }}</p>
-                <p class="text-xs text-indigo-100 font-medium mt-1">Total Proyek</p>
-                <div class="mt-2 flex items-center text-green-300 text-xs animate-fade-in" style="animation-delay: 1.2s;">
-                    <i class="fas fa-arrow-up mr-1 animate-bounce-subtle"></i>
-                    <span>Active</span>
-                </div>
-            </div>
-            <div class="bg-white/10 backdrop-blur-xl rounded-lg p-3 border border-white/20 transform transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:bg-white/15 hover:-translate-y-2 animate-bounce-in" style="animation-delay: 1.1s;">
-                <p class="text-2xl font-bold text-white drop-shadow-lg animate-count-up">{{ \App\Models\User::count() }}</p>
-                <p class="text-xs text-indigo-100 font-medium mt-1">Total User</p>
-                <div class="mt-2 flex items-center text-green-300 text-xs animate-fade-in" style="animation-delay: 1.3s;">
-                    <i class="fas fa-user-check mr-1 animate-bounce-subtle"></i>
-                    <span>Online</span>
-                </div>
-            </div>
-        </div>
+    <!-- Footer tanpa stats (karena sudah dipindahkan ke atas) -->
+    <div class="relative p-4 border-t border-white/20 bg-white/5 backdrop-blur-xl">
+        <p class="text-xs text-center text-indigo-100">© 2025 Project Manager</p>
     </div>
 
     <style>
@@ -308,7 +316,7 @@
         }
 
         .animate-slide-up {
-            animation: slide-up 0.6s ease-out 1.2s backwards;
+            animation: slide-up 0.6s ease-out backwards;
         }
 
         /* Scale animation */

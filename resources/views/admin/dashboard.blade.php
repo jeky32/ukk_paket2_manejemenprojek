@@ -181,9 +181,6 @@
                         <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                             @yield('page-title', 'Dashboard Admin')
                         </h1>
-                        <p class="text-sm text-gray-600 mt-1">
-                            @yield('page-subtitle', 'Manajemen Proyek dan Tim')
-                        </p>
                     </div>
 
                     <div class="flex items-center space-x-4 animate-fade-in-left" style="animation-delay: 0.2s;">
