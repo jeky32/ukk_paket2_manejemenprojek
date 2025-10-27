@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -16,59 +17,45 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
-
     public function login(Request $request)
     {
-        $request->validate([
-            'login' => 'required|string',
-            'password' => 'required|string',
-        ]);
+    $request->validate([
+        'email' => 'required|string',
+        'password' => 'required|string',
+    ]);
 
-        $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-        $user = User::where($loginType, $request->login)->first();
+    // ✅ FIX: Gunakan $request->email bukan $request->login
+    $loginField = filter_var($request->email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+    $user = User::where($loginField, $request->email)->first();
 
-        if (!$user) {
-            return back()->withErrors(['login' => 'Username atau email tidak ditemukan.']);
-        }
+    if (!$user) {
+        return back()->withErrors(['email' => 'Email tidak ditemukan.'])->withInput();
+    }
 
-        // 🔹 Jika password di database masih plaintext, hash otomatis
-        if (!Hash::check($request->password, $user->password)) {
-            if ($user->password === $request->password) {
-                $user->password = Hash::make($request->password);
-                $user->save();
-            } else {
-                return back()->withErrors(['login' => 'Username atau password salah.']);
-            }
-        }
-
-        // 🔹 Login berhasil
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        // Simpan info tambahan di session (pakai user_id agar sesuai model)
-        session([
-            'user_id'   => $user->user_id,
-            'role'      => $user->role,
-            'username'  => $user->username,
-            'full_name' => $user->full_name ?? $user->username,
-        ]);
-
-        // 🔹 Arahkan ke dashboard sesuai role
-        switch ($user->role) {
-            case 'admin':
-                return redirect()->route('dashboard')->with('success', 'Selamat datang kembali, Admin!');
-            case 'teamlead':
-            case 'team_lead':
-                return redirect()->route('teamlead.dashboard')->with('success', 'Selamat datang kembali, Team Lead!');
-            case 'developer':
-                return redirect()->route('developer.dashboard')->with('success', 'Halo Developer!');
-            case 'designer':
-                return redirect()->route('designer.dashboard')->with('success', 'Halo Designer!');
-            default:
-                return redirect()->route('dashboard')->with('success', 'Selamat datang kembali!');
+    // 🔐 Cek password
+    if (!Hash::check($request->password, $user->password)) {
+        // Auto-hash untuk password plaintext (jika ada)
+        if ($user->password === $request->password) {
+            $user->password = Hash::make($request->password);
+            $user->save();
+        } else {
+            return back()->withErrors(['password' => 'Password salah.'])->withInput();
         }
     }
 
+    // ✅ Login berhasil
+    Auth::login($user);
+    $request->session()->regenerate();
+
+    session([
+        'user_id'   => $user->id,
+        'role'      => $user->role,
+        'username'  => $user->username,
+        'full_name' => $user->full_name ?? $user->username,
+    ]);
+
+    return $this->redirectByRole($user);
+    }
     // ==========================================================
     // 🔹 REGISTER
     // ==========================================================
@@ -80,26 +67,44 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|max:255|unique:users,username',
-            'email'    => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'role'     => 'nullable|string'
+            'full_name' => 'required|string|max:255',
+            'email'     => 'required|email|max:255|unique:users,email',
+            'password'  => 'required|string|min:6|confirmed',
         ]);
 
-        // Default role = developer jika tidak diisi
-        $role = $request->role ?: 'developer';
+        // 🔹 Buat username unik otomatis
+        $baseUsername = Str::slug($request->full_name);
+        $username = $baseUsername ?: 'user';
+        $counter = 1;
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter++;
+        }
 
+        // 🔹 Tentukan role otomatis:
+        // 1 = admin, 2 = teamlead, 3+ = developer
+        $userCount = User::count();
+        if ($userCount === 0) {
+            $role = 'admin';
+        } elseif ($userCount === 1) {
+            $role = 'teamlead';
+        } else {
+            $role = 'developer';
+        }
+
+        // 🔹 Simpan user ke database
         $user = User::create([
-            'username'   => $request->username,
-            'full_name'  => $request->username,
-            'email'      => $request->email,
-            'password'   => Hash::make($request->password),
-            'role'       => strtolower($role),
+            'username'  => $username,
+            'full_name' => $request->full_name,
+            'email'     => $request->email,
+            'password'  => $request->password, // auto hash di model User
+            'role'      => $role,
         ]);
 
+        // 🔹 Login otomatis setelah register
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Akun berhasil dibuat! Selamat datang, ' . $user->username . '.');
+        // 🔹 Redirect sesuai role
+        return $this->redirectByRole($user, true);
     }
 
     // ==========================================================
@@ -112,5 +117,28 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login')->with('success', 'Berhasil logout!');
+    }
+
+    // ==========================================================
+    // 🔹 Fungsi bantu: Redirect berdasarkan role
+    // ==========================================================
+    private function redirectByRole($user, $isRegister = false)
+    {
+        $message = $isRegister
+            ? "Akun {$user->role} berhasil dibuat! Selamat datang, {$user->full_name}."
+            : "Selamat datang kembali, {$user->full_name}!";
+
+        switch ($user->role) {
+            case 'admin':
+                return redirect()->route('admin.dashboard')->with('success', $message);
+            case 'teamlead':
+                return redirect()->route('teamlead.dashboard')->with('success', $message);
+            case 'developer':
+                return redirect()->route('developer.dashboard')->with('success', $message);
+            case 'designer':
+                return redirect()->route('designer.dashboard')->with('success', $message);
+            default:
+                return redirect()->route('dashboard')->with('success', $message);
+        }
     }
 }

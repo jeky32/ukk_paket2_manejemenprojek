@@ -1,68 +1,10 @@
-<script>
-        // Password strength checker
-        function checkPasswordStrength(password) {
-            const strengthFill = document.getElementById('strengthFill');
-            const strengthText = document.getElementById('strengthText');
-
-            let strength = 0;
-
-            if (password.length >= 8) strength++;
-            if (password.match(/[a-z]+/)) strength++;
-            if (password.match(/[A-Z]+/)) strength++;
-            if (password.match(/[0-9]+/)) strength++;
-            if (password.match(/[$@#&!]+/)) strength++;
-
-            strengthFill.className = 'strength-fill';
-
-            if (password.length === 0) {
-                strengthText.textContent = '';
-                strengthFill.className = 'strength-fill';
-            } else if (strength < 2) {
-                strengthFill.classList.add('weak');
-                strengthText.textContent = 'Lemah';
-            } else if (strength < 4) {
-                strengthFill.classList.add('medium');
-                strengthText.textContent = 'Sedang';
-            } else {
-                strengthFill.classList.add('strong');
-                strengthText.textContent = 'Kuat';
-            }
-        }
-
-        // Untuk Laravel flash messages, uncomment ini:
-        /*
-        document.addEventListener('DOMContentLoaded', function() {
-            const alertContainer = document.getElementById('alert-container');
-
-            @if (session('success'))
-                alertContainer.innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                `;
-            @endif
-
-            @if ($errors->any())
-                alertContainer.innerHTML = `
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span>
-                            @foreach ($errors->all() as $error)
-                                {{ $error }}
-                            @endforeach
-                        </span>
-                    </div>
-                `;
-            @endif
-        });
-        */
-    </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register - Timly</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Register - TIMLY</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
     <style>
@@ -92,6 +34,18 @@
             overflow: hidden;
             display: grid;
             grid-template-columns: 1fr 1fr;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Left Section - Illustration */
@@ -166,12 +120,14 @@
             height: auto;
         }
 
-        /* Right Section - Register Form */
+        /* Right Section */
         .right-section {
             padding: 60px 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .form-header {
@@ -208,87 +164,6 @@
 
         .step.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        /* Benefits section */
-        .benefits {
-            background: #f8f9ff;
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 20px;
-            border-left: 4px solid #667eea;
-        }
-
-        .benefit-item {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 13px;
-            color: #374151;
-        }
-
-        .benefit-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .benefit-item i {
-            color: #667eea;
-            font-weight: 600;
-            min-width: 16px;
-        }
-
-        /* Password strength indicator */
-        .password-strength {
-            margin-top: 6px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .strength-bar {
-            flex: 1;
-            height: 4px;
-            background: #e5e7eb;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .strength-fill {
-            height: 100%;
-            width: 0%;
-            background: #ff6b6b;
-            transition: all 0.3s ease;
-        }
-
-        .strength-fill.weak {
-            width: 33%;
-            background: #ff6b6b;
-        }
-
-        .strength-fill.medium {
-            width: 66%;
-            background: #ffd43b;
-        }
-
-        .strength-fill.strong {
-            width: 100%;
-            background: #51cf66;
-        }
-
-        .strength-text {
-            color: #6b7280;
-            font-size: 11px;
-        }
-
-        .register-section a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .register-section a:hover {
-            text-decoration: underline;
         }
 
         /* Alert Messages */
@@ -399,9 +274,14 @@
             color: #9ca3af;
         }
 
-        .form-select option {
-            background: white;
-            color: #1e1e1e;
+        .input-error {
+            border-color: #ef4444 !important;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
         }
 
         /* Two column layout */
@@ -409,6 +289,50 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
+        }
+
+        /* Password strength indicator */
+        .password-strength {
+            margin-top: 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            background: #ff6b6b;
+            transition: all 0.3s ease;
+        }
+
+        .strength-fill.weak {
+            width: 33%;
+            background: #ff6b6b;
+        }
+
+        .strength-fill.medium {
+            width: 66%;
+            background: #ffd43b;
+        }
+
+        .strength-fill.strong {
+            width: 100%;
+            background: #51cf66;
+        }
+
+        .strength-text {
+            color: #6b7280;
+            font-size: 11px;
         }
 
         /* Register Button */
@@ -430,6 +354,12 @@
         .register-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .register-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* Login Link */
@@ -464,83 +394,35 @@
             font-weight: 500;
         }
 
-        /* Success Message */
-        .success-message {
-            display: none;
-            text-align: center;
-            animation: scaleInCenter 0.6s ease-out;
+        .terms-text a:hover {
+            text-decoration: underline;
         }
 
-        @keyframes scaleInCenter {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        /* Benefits section */
+        .benefits {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
         }
 
-        .success-icon {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
+        .benefit-item {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 28px;
-            font-size: 50px;
-            color: white;
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
-            animation: bounce 0.8s ease-out;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #374151;
         }
 
-        @keyframes bounce {
-            0% {
-                transform: scale(0.3) rotateZ(-45deg);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
+        .benefit-item:last-child {
+            margin-bottom: 0;
         }
 
-        .success-message h2 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .success-message p {
-            font-size: 14px;
-            color: #6b7280;
-            line-height: 1.8;
-            margin-bottom: 24px;
-        }
-
-        .success-message a {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 32px;
-            border-radius: 8px;
-            text-decoration: none;
+        .benefit-item i {
+            color: #667eea;
             font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .success-message a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            min-width: 16px;
         }
 
         /* Responsive */
@@ -573,119 +455,130 @@
         <div class="left-section">
             <div class="left-content">
                 <div class="left-header">
-                    <h3>Teamline</h3>
-                    <p>Project Management Service</p>
-                    <small>Bergabunglah dengan ribuan tim yang produktif</small>
+                    <h2>TIMLY</h2>
+                    <p>Project Management</p>
                 </div>
 
                 <div class="illustration">
                     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Background decorative circles -->
-                        <circle cx="350" cy="80" r="60" fill="rgba(255,255,255,0.08)"/>
-                        <circle cx="80" cy="320" r="50" fill="rgba(255,255,255,0.06)"/>
+                        <!-- Background circles with animation -->
+                        <circle cx="350" cy="80" r="60" fill="rgba(255,255,255,0.08)">
+                            <animate attributeName="r" values="60;70;60" dur="4s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="80" cy="320" r="50" fill="rgba(255,255,255,0.06)">
+                            <animate attributeName="r" values="50;60;50" dur="5s" repeatCount="indefinite"/>
+                        </circle>
 
-                        <!-- Central Table/Meeting Circle -->
-                        <ellipse cx="200" cy="240" rx="80" ry="30" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                        <!-- Platform -->
+                        <ellipse cx="200" cy="280" rx="120" ry="40" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="2">
+                            <animate attributeName="ry" values="40;42;40" dur="3s" repeatCount="indefinite"/>
+                        </ellipse>
 
-                        <!-- Meeting Items on table -->
-                        <rect x="140" y="225" width="30" height="20" rx="3" fill="#ff6b6b" opacity="0.8"/>
-                        <rect x="230" y="225" width="30" height="20" rx="3" fill="#4ecdc4" opacity="0.8"/>
-                        <circle cx="200" cy="235" r="8" fill="#ffd43b" opacity="0.8"/>
+                        <!-- Person 1 - Developer -->
+                        <g>
+                            <circle cx="100" cy="180" r="24" fill="#FCD34D">
+                                <animate attributeName="cy" values="180;178;180" dur="4s" repeatCount="indefinite"/>
+                            </circle>
+                            <path d="M 85 170 Q 100 160 115 170" fill="#78350F" opacity="0.8"/>
+                            <circle cx="93" cy="178" r="2.5" fill="#1e1e1e"/>
+                            <circle cx="107" cy="178" r="2.5" fill="#1e1e1e"/>
+                            <path d="M 93 188 Q 100 192 107 188" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <rect x="85" y="205" width="30" height="55" rx="15" fill="#3B82F6">
+                                <animate attributeName="y" values="205;203;205" dur="4s" repeatCount="indefinite"/>
+                            </rect>
+                            <path d="M 85 220 Q 70 225 65 235" stroke="#FCD34D" stroke-width="11" stroke-linecap="round">
+                                <animate attributeName="d" values="M 85 220 Q 70 225 65 235; M 85 220 Q 70 223 65 233; M 85 220 Q 70 225 65 235" dur="1s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M 115 220 Q 130 225 135 235" stroke="#FCD34D" stroke-width="11" stroke-linecap="round">
+                                <animate attributeName="d" values="M 115 220 Q 130 225 135 235; M 115 220 Q 130 223 135 233; M 115 220 Q 130 225 135 235" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+                            </path>
+                            <rect x="92" y="260" width="7" height="30" rx="3" fill="#1e293b"/>
+                            <rect x="101" y="260" width="7" height="30" rx="3" fill="#1e293b"/>
+                        </g>
 
-                        <!-- Person 1 (Top Left) - Leaning forward enthusiastically -->
-                        <!-- Head -->
-                        <circle cx="90" cy="120" r="22" fill="#FFB84D"/>
-                        <circle cx="82" cy="115" r="3" fill="#1e1e1e"/>
-                        <circle cx="98" cy="115" r="3" fill="#1e1e1e"/>
-                        <path d="M 82 125 Q 90 128 98 125" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        <!-- Smile -->
-                        <path d="M 85 128 Q 90 131 95 128" stroke="#1e1e1e" stroke-width="1.5" fill="none"/>
-                        <!-- Body (leaning) -->
-                        <rect x="75" y="145" width="30" height="50" rx="15" fill="#3B82F6" transform="rotate(-15 90 145)"/>
-                        <!-- Arms pointing to center -->
-                        <path d="M 65 155 Q 50 170 40 180" stroke="#FFB84D" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
-                        <rect x="65" y="150" width="12" height="8" rx="4" fill="#FFB84D"/>
-                        <!-- Legs -->
-                        <rect x="82" y="195" width="7" height="30" rx="3" fill="#1e293b"/>
-                        <rect x="91" y="195" width="7" height="30" rx="3" fill="#1e293b"/>
+                        <!-- Person 2 - Manager -->
+                        <g>
+                            <circle cx="200" cy="160" r="26" fill="#F59E0B">
+                                <animate attributeName="cy" values="160;158;160" dur="3s" repeatCount="indefinite"/>
+                            </circle>
+                            <ellipse cx="200" cy="150" rx="20" ry="12" fill="#92400E"/>
+                            <circle cx="192" cy="158" r="3" fill="#1e1e1e"/>
+                            <circle cx="208" cy="158" r="3" fill="#1e1e1e"/>
+                            <path d="M 190 168 Q 200 173 210 168" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <rect x="182" y="187" width="36" height="60" rx="18" fill="#8B5CF6">
+                                <animate attributeName="y" values="187;185;187" dur="3s" repeatCount="indefinite"/>
+                            </rect>
+                            <path d="M 182 205 Q 160 200 145 185" stroke="#F59E0B" stroke-width="12" stroke-linecap="round">
+                                <animate attributeName="d" values="M 182 205 Q 160 200 145 185; M 182 205 Q 160 195 140 180; M 182 205 Q 160 200 145 185" dur="2s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M 218 205 Q 240 200 255 185" stroke="#F59E0B" stroke-width="12" stroke-linecap="round">
+                                <animate attributeName="d" values="M 218 205 Q 240 200 255 185; M 218 205 Q 240 195 260 180; M 218 205 Q 240 200 255 185" dur="2s" repeatCount="indefinite" begin="1s"/>
+                            </path>
+                            <rect x="192" y="247" width="7" height="35" rx="3" fill="#1e293b"/>
+                            <rect x="201" y="247" width="7" height="35" rx="3" fill="#1e293b"/>
+                        </g>
 
-                        <!-- Person 2 (Top Right) - Enthusiastic, hands up -->
-                        <!-- Head -->
-                        <circle cx="310" cy="110" r="22" fill="#F472B6"/>
-                        <circle cx="302" cy="105" r="3" fill="#1e1e1e"/>
-                        <circle cx="318" cy="105" r="3" fill="#1e1e1e"/>
-                        <path d="M 302 115 Q 310 118 318 115" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        <!-- Smile wide -->
-                        <path d="M 305 120 Q 310 123 315 120" stroke="#1e1e1e" stroke-width="2" fill="none"/>
-                        <!-- Body -->
-                        <rect x="295" y="135" width="30" height="50" rx="15" fill="#A855F7"/>
-                        <!-- Arms raised (celebrating) -->
-                        <path d="M 280 145 Q 270 120 265 90" stroke="#F472B6" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
-                        <path d="M 320 145 Q 330 120 335 90" stroke="#F472B6" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
-                        <!-- Legs -->
-                        <rect x="302" y="185" width="7" height="35" rx="3" fill="#1e293b"/>
-                        <rect x="311" y="185" width="7" height="35" rx="3" fill="#1e293b"/>
+                        <!-- Person 3 - Designer -->
+                        <g>
+                            <circle cx="300" cy="185" r="23" fill="#EC4899">
+                                <animate attributeName="cy" values="185;183;185" dur="3.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="315" cy="180" r="8" fill="#9D174D"/>
+                            <ellipse cx="300" cy="175" rx="18" ry="10" fill="#9D174D"/>
+                            <circle cx="293" cy="183" r="2.5" fill="#1e1e1e"/>
+                            <circle cx="307" cy="183" r="2.5" fill="#1e1e1e"/>
+                            <path d="M 293 192 Q 300 195 307 192" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <rect x="285" y="210" width="30" height="52" rx="15" fill="#10B981">
+                                <animate attributeName="y" values="210;208;210" dur="3.5s" repeatCount="indefinite"/>
+                            </rect>
+                            <path d="M 285 225 Q 270 230 265 235" stroke="#EC4899" stroke-width="10" stroke-linecap="round"/>
+                            <rect x="255" y="230" width="25" height="18" rx="2" fill="#60A5FA" stroke="#3B82F6" stroke-width="1.5"/>
+                            <path d="M 315 225 Q 295 235 280 240" stroke="#EC4899" stroke-width="10" stroke-linecap="round">
+                                <animate attributeName="d" values="M 315 225 Q 295 235 280 240; M 315 225 Q 295 233 278 238; M 315 225 Q 295 235 280 240" dur="1.5s" repeatCount="indefinite"/>
+                            </path>
+                            <rect x="292" y="262" width="7" height="28" rx="3" fill="#1e293b"/>
+                            <rect x="301" y="262" width="7" height="28" rx="3" fill="#1e293b"/>
+                        </g>
 
-                        <!-- Person 3 (Bottom Center-Left) - Sitting, relaxed -->
-                        <!-- Head -->
-                        <circle cx="140" cy="180" r="20" fill="#FBBF24"/>
-                        <circle cx="133" cy="176" r="2.5" fill="#1e1e1e"/>
-                        <circle cx="147" cy="176" r="2.5" fill="#1e1e1e"/>
-                        <path d="M 133 185 Q 140 188 147 185" stroke="#1e1e1e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                        <!-- Smile -->
-                        <path d="M 136 189 Q 140 191 144 189" stroke="#1e1e1e" stroke-width="1" fill="none"/>
-                        <!-- Body (seated) -->
-                        <rect x="128" y="202" width="24" height="45" rx="12" fill="#06B6D4"/>
-                        <!-- Arms on table -->
-                        <rect x="110" y="210" width="18" height="8" rx="4" fill="#FBBF24"/>
-                        <rect x="152" y="210" width="18" height="8" rx="4" fill="#FBBF24"/>
-                        <!-- Legs under table -->
-                        <rect x="134" y="247" width="6" height="25" rx="3" fill="#1e293b"/>
-                        <rect x="142" y="247" width="6" height="25" rx="3" fill="#1e293b"/>
+                        <!-- Notification icons -->
+                        <g transform="translate(50, 100)">
+                            <circle cx="0" cy="0" r="12" fill="#EF4444" opacity="0.9">
+                                <animate attributeName="cy" values="0;-5;0" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <path d="M -4 -2 Q 0 -6 4 -2 L 4 2 Q 4 4 2 4 L -2 4 Q -4 4 -4 2 Z" fill="white"/>
+                            <circle cx="0" cy="5" r="1" fill="white"/>
+                        </g>
 
-                        <!-- Person 4 (Bottom Center-Right) - Sitting, speaking -->
-                        <!-- Head -->
-                        <circle cx="260" cy="180" r="20" fill="#FB7185"/>
-                        <circle cx="253" cy="176" r="2.5" fill="#1e1e1e"/>
-                        <circle cx="267" cy="176" r="2.5" fill="#1e1e1e"/>
-                        <path d="M 253 185 Q 260 189 267 185" stroke="#1e1e1e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                        <!-- Open mouth (speaking) -->
-                        <ellipse cx="260" cy="191" rx="3" ry="4" fill="#1e1e1e"/>
-                        <!-- Body (seated) -->
-                        <rect x="248" y="202" width="24" height="45" rx="12" fill="#10B981"/>
-                        <!-- Arms gesturing -->
-                        <path d="M 245 215 Q 225 210 215 200" stroke="#FB7185" stroke-width="9" stroke-linecap="round" opacity="0.9"/>
-                        <rect x="248" y="210" width="10" height="7" rx="3" fill="#FB7185"/>
-                        <!-- Legs under table -->
-                        <rect x="254" y="247" width="6" height="25" rx="3" fill="#1e293b"/>
-                        <rect x="262" y="247" width="6" height="25" rx="3" fill="#1e293b"/>
+                        <g transform="translate(350, 200)">
+                            <circle cx="0" cy="0" r="12" fill="#3B82F6" opacity="0.9">
+                                <animate attributeName="cy" values="0;-5;0" dur="2.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <rect x="-5" y="-3" width="10" height="6" rx="1" fill="white"/>
+                            <path d="M -5 -3 L 0 1 L 5 -3" stroke="white" stroke-width="1" fill="none"/>
+                        </g>
 
-                        <!-- Laptops on table -->
-                        <rect x="155" y="255" width="20" height="12" rx="2" fill="#374151" opacity="0.7"/>
-                        <rect x="225" y="255" width="20" height="12" rx="2" fill="#374151" opacity="0.7"/>
+                        <!-- Text bubbles -->
+                        <g>
+                            <ellipse cx="60" cy="160" rx="28" ry="18" fill="rgba(255,255,255,0.95)">
+                                <animate attributeName="ry" values="18;20;18" dur="2s" repeatCount="indefinite"/>
+                            </ellipse>
+                            <polygon points="50,175 42,185 55,178" fill="rgba(255,255,255,0.95)"/>
+                            <text x="60" y="165" font-size="20" fill="#667eea" text-anchor="middle">💡</text>
 
-                        <!-- Chat bubbles showing communication -->
-                        <!-- Bubble 1 (Person 1) -->
-                        <ellipse cx="50" cy="130" rx="25" ry="16" fill="rgba(255,255,255,0.95)"/>
-                        <polygon points="45,145 35,155 48,148" fill="rgba(255,255,255,0.95)"/>
-                        <circle cx="45" cy="130" r="2" fill="#667eea"/>
-                        <circle cx="55" cy="130" r="2" fill="#667eea"/>
-                        <circle cx="65" cy="130" r="2" fill="#667eea"/>
-
-                        <!-- Bubble 2 (Person 2) -->
-                        <ellipse cx="360" cy="85" rx="25" ry="16" fill="rgba(255,255,255,0.95)"/>
-                        <polygon points="375,95 385,75 370,88" fill="rgba(255,255,255,0.95)"/>
-                        <circle cx="355" cy="85" r="2" fill="#667eea"/>
-                        <circle cx="365" cy="85" r="2" fill="#667eea"/>
-
-                        <!-- Decorative elements -->
-                        <circle cx="50" cy="340" r="14" fill="rgba(255,255,255,0.9)"/>
-                        <path d="M 45 335 L 50 340 L 55 335" stroke="#667eea" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        <line x1="45" y1="345" x2="55" y2="345" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <ellipse cx="340" cy="170" rx="28" ry="18" fill="rgba(255,255,255,0.95)">
+                                <animate attributeName="ry" values="18;20;18" dur="2.5s" repeatCount="indefinite"/>
+                            </ellipse>
+                            <polygon points="350,185 358,195 345,188" fill="rgba(255,255,255,0.95)"/>
+                            <text x="340" y="175" font-size="20" fill="#667eea" text-anchor="middle">✓</text>
+                        </g>
 
                         <!-- Success indicator -->
-                        <circle cx="360" cy="350" r="16" fill="#10B981" opacity="0.8"/>
-                        <path d="M 355 350 L 360 355 L 368 345" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <g transform="translate(360, 340)">
+                            <circle cx="0" cy="0" r="18" fill="#10B981" opacity="0.9">
+                                <animate attributeName="r" values="18;20;18" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <path d="M -6 0 L -2 4 L 6 -4" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
                     </svg>
                 </div>
             </div>
@@ -705,11 +598,28 @@
                 <div class="step"></div>
             </div>
 
-            <!-- Alert Container -->
-            <div id="alert-container"></div>
+            <!-- Session Status -->
+            @if (session('status'))
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <!-- Validation Errors -->
+            @if ($errors->any())
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>
+                        @foreach ($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <!-- Google Register Button -->
-            <a href="{{ route('auth.google') }}" class="google-register-btn">
+            <a href="#" class="google-register-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -729,15 +639,20 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="name" class="form-label">Nama Lengkap</label>
+                        <label for="full_name" class="form-label">Nama Lengkap</label>
                         <input
-                            id="name"
-                            name="name"
+                            id="full_name"
+                            name="full_name"
                             type="text"
                             required
-                            value="{{ old('name') }}"
-                            class="form-input"
+                            autofocus
+                            autocomplete="full_name"
+                            value="{{ old('full_name') }}"
+                            class="form-input @error('full_name') input-error @enderror"
                             placeholder="Masukkan nama lengkap">
+                        @error('full_name')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
@@ -747,9 +662,13 @@
                             name="email"
                             type="email"
                             required
+                            autocomplete="username"
                             value="{{ old('email') }}"
-                            class="form-input"
-                            placeholder="Masukkan email aktif">
+                            class="form-input @error('email') input-error @enderror"
+                            placeholder="example@email.com">
+                        @error('email')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -761,7 +680,8 @@
                             name="password"
                             type="password"
                             required
-                            class="form-input"
+                            autocomplete="new-password"
+                            class="form-input @error('password') input-error @enderror"
                             placeholder="Minimal 8 karakter"
                             onkeyup="checkPasswordStrength(this.value)">
                         <div class="password-strength">
@@ -770,6 +690,9 @@
                             </div>
                             <span class="strength-text" id="strengthText"></span>
                         </div>
+                        @error('password')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
@@ -779,8 +702,12 @@
                             name="password_confirmation"
                             type="password"
                             required
-                            class="form-input"
+                            autocomplete="new-password"
+                            class="form-input @error('password_confirmation') input-error @enderror"
                             placeholder="Ulangi password">
+                        @error('password_confirmation')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -789,10 +716,12 @@
                 </button>
             </form>
 
-            <div class="login-section">
-                Sudah punya akun?
-                <a href="{{ route('login') }}">Masuk di sini</a>
-            </div>
+            @if (Route::has('login'))
+                <div class="login-section">
+                    Sudah punya akun?
+                    <a href="{{ route('login') }}">Masuk di sini</a>
+                </div>
+            @endif
 
             <div class="terms-text">
                 Dengan mendaftar, Anda setuju dengan
@@ -810,73 +739,4 @@
                     <i class="fas fa-check"></i>
                     <span>Kolaborasi real-time dengan tim</span>
                 </div>
-                <div class="benefit-item">
-                    <i class="fas fa-check"></i>
-                    <span>Akses gratis untuk 3 proyek pertama</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Password strength checker
-        function checkPasswordStrength(password) {
-            const strengthFill = document.getElementById('strengthFill');
-            const strengthText = document.getElementById('strengthText');
-
-            let strength = 0;
-
-            if (password.length >= 8) strength++;
-            if (password.match(/[a-z]+/)) strength++;
-            if (password.match(/[A-Z]+/)) strength++;
-            if (password.match(/[0-9]+/)) strength++;
-            if (password.match(/[$@#&!]+/)) strength++;
-
-            strengthFill.className = 'strength-fill';
-
-            if (password.length === 0) {
-                strengthText.textContent = '';
-                strengthFill.className = 'strength-fill';
-            } else if (strength < 2) {
-                strengthFill.classList.add('weak');
-                strengthText.textContent = 'Lemah';
-            } else if (strength < 4) {
-                strengthFill.classList.add('medium');
-                strengthText.textContent = 'Sedang';
-            } else {
-                strengthFill.classList.add('strong');
-                strengthText.textContent = 'Kuat';
-            }
-        }
-
-        // Untuk Laravel flash messages, uncomment ini:
-        /*
-        document.addEventListener('DOMContentLoaded', function() {
-            const alertContainer = document.getElementById('alert-container');
-
-            @if (session('success'))
-                alertContainer.innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                `;
-            @endif
-
-            @if ($errors->any())
-                alertContainer.innerHTML = `
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span>
-                            @foreach ($errors->all() as $error)
-                                {{ $error }}
-                            @endforeach
-                        </span>
-                    </div>
-                `;
-            @endif
-        });
-        */
-    </script>
-</body>
-</html>
+                <div class="benefit

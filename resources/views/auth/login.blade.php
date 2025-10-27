@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="">
-    <title>Timly - Login</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>TIMLY - Login</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -39,6 +39,18 @@
             overflow: hidden;
             display: grid;
             grid-template-columns: 1fr 1fr;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Left Section - Illustration */
@@ -242,6 +254,16 @@
             color: #9ca3af;
         }
 
+        .input-error {
+            border-color: #ef4444 !important;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
         .password-field {
             position: relative;
         }
@@ -259,11 +281,31 @@
             padding: 0;
         }
 
-        /* Forgot Password */
-        .forgot-password {
-            text-align: right;
+        /* Remember Me & Forgot Password */
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-top: 8px;
             margin-bottom: 20px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            text-align: right;
         }
 
         .forgot-password a {
@@ -310,6 +352,12 @@
         .login-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* Register Link */
@@ -387,119 +435,226 @@
         <div class="left-section">
             <div class="left-content">
                 <div class="left-header">
-                    <h3>Timly</h3>
+                    <h2>TIMLY</h2>
                     <p>Project Management</p>
-                    <small>Team collaboration made easy</small>
                 </div>
 
                 <div class="illustration">
                     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Background decorative circles -->
-                        <circle cx="350" cy="80" r="60" fill="rgba(255,255,255,0.08)"/>
-                        <circle cx="80" cy="320" r="50" fill="rgba(255,255,255,0.06)"/>
+                        <!-- Background decorative circles with animation -->
+                        <circle cx="350" cy="80" r="60" fill="rgba(255,255,255,0.08)">
+                            <animate attributeName="r" values="60;70;60" dur="4s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="80" cy="320" r="50" fill="rgba(255,255,255,0.06)">
+                            <animate attributeName="r" values="50;60;50" dur="5s" repeatCount="indefinite"/>
+                        </circle>
 
-                        <!-- Central Table/Meeting Circle -->
-                        <ellipse cx="200" cy="240" rx="80" ry="30" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                        <!-- Floating particles -->
+                        <circle cx="100" cy="50" r="3" fill="rgba(255,255,255,0.4)">
+                            <animate attributeName="cy" values="50;30;50" dur="3s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="320" cy="300" r="4" fill="rgba(255,255,255,0.3)">
+                            <animate attributeName="cy" values="300;280;300" dur="4s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.3;0.7;0.3" dur="4s" repeatCount="indefinite"/>
+                        </circle>
 
-                        <!-- Meeting Items on table -->
-                        <rect x="140" y="225" width="30" height="20" rx="3" fill="#ff6b6b" opacity="0.8"/>
-                        <rect x="230" y="225" width="30" height="20" rx="3" fill="#4ecdc4" opacity="0.8"/>
-                        <circle cx="200" cy="235" r="8" fill="#ffd43b" opacity="0.8"/>
+                        <!-- Central Platform/Stage -->
+                        <ellipse cx="200" cy="280" rx="120" ry="40" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="2">
+                            <animate attributeName="ry" values="40;42;40" dur="3s" repeatCount="indefinite"/>
+                        </ellipse>
 
-                        <!-- Person 1 (Top Left) - Leaning forward enthusiastically -->
-                        <!-- Head -->
-                        <circle cx="90" cy="120" r="22" fill="#FFB84D"/>
-                        <circle cx="82" cy="115" r="3" fill="#1e1e1e"/>
-                        <circle cx="98" cy="115" r="3" fill="#1e1e1e"/>
-                        <path d="M 82 125 Q 90 128 98 125" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        <!-- Smile -->
-                        <path d="M 85 128 Q 90 131 95 128" stroke="#1e1e1e" stroke-width="1.5" fill="none"/>
-                        <!-- Body (leaning) -->
-                        <rect x="75" y="145" width="30" height="50" rx="15" fill="#3B82F6" transform="rotate(-15 90 145)"/>
-                        <!-- Arms pointing to center -->
-                        <path d="M 65 155 Q 50 170 40 180" stroke="#FFB84D" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
-                        <rect x="65" y="150" width="12" height="8" rx="4" fill="#FFB84D"/>
-                        <!-- Legs -->
-                        <rect x="82" y="195" width="7" height="30" rx="3" fill="#1e293b"/>
-                        <rect x="91" y="195" width="7" height="30" rx="3" fill="#1e293b"/>
+                        <!-- Laptop screens on platform -->
+                        <g>
+                            <!-- Laptop 1 -->
+                            <rect x="140" y="265" width="35" height="22" rx="2" fill="#4F46E5" opacity="0.8"/>
+                            <rect x="142" y="267" width="31" height="17" rx="1" fill="#818CF8"/>
+                            <line x1="142" y1="270" x2="170" y2="270" stroke="#6366F1" stroke-width="1"/>
+                            <line x1="142" y1="273" x2="165" y2="273" stroke="#6366F1" stroke-width="1"/>
 
-                        <!-- Person 2 (Top Right) - Enthusiastic, hands up -->
-                        <!-- Head -->
-                        <circle cx="310" cy="110" r="22" fill="#F472B6"/>
-                        <circle cx="302" cy="105" r="3" fill="#1e1e1e"/>
-                        <circle cx="318" cy="105" r="3" fill="#1e1e1e"/>
-                        <path d="M 302 115 Q 310 118 318 115" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        <!-- Smile wide -->
-                        <path d="M 305 120 Q 310 123 315 120" stroke="#1e1e1e" stroke-width="2" fill="none"/>
-                        <!-- Body -->
-                        <rect x="295" y="135" width="30" height="50" rx="15" fill="#A855F7"/>
-                        <!-- Arms raised (celebrating) -->
-                        <path d="M 280 145 Q 270 120 265 90" stroke="#F472B6" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
-                        <path d="M 320 145 Q 330 120 335 90" stroke="#F472B6" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
-                        <!-- Legs -->
-                        <rect x="302" y="185" width="7" height="35" rx="3" fill="#1e293b"/>
-                        <rect x="311" y="185" width="7" height="35" rx="3" fill="#1e293b"/>
+                            <!-- Laptop 2 -->
+                            <rect x="225" y="265" width="35" height="22" rx="2" fill="#7C3AED" opacity="0.8"/>
+                            <rect x="227" y="267" width="31" height="17" rx="1" fill="#A78BFA"/>
+                            <line x1="227" y1="270" x2="255" y2="270" stroke="#8B5CF6" stroke-width="1"/>
+                            <line x1="227" y1="273" x2="250" y2="273" stroke="#8B5CF6" stroke-width="1"/>
+                        </g>
 
-                        <!-- Person 3 (Bottom Center-Left) - Sitting, relaxed -->
-                        <!-- Head -->
-                        <circle cx="140" cy="180" r="20" fill="#FBBF24"/>
-                        <circle cx="133" cy="176" r="2.5" fill="#1e1e1e"/>
-                        <circle cx="147" cy="176" r="2.5" fill="#1e1e1e"/>
-                        <path d="M 133 185 Q 140 188 147 185" stroke="#1e1e1e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                        <!-- Smile -->
-                        <path d="M 136 189 Q 140 191 144 189" stroke="#1e1e1e" stroke-width="1" fill="none"/>
-                        <!-- Body (seated) -->
-                        <rect x="128" y="202" width="24" height="45" rx="12" fill="#06B6D4"/>
-                        <!-- Arms on table -->
-                        <rect x="110" y="210" width="18" height="8" rx="4" fill="#FBBF24"/>
-                        <rect x="152" y="210" width="18" height="8" rx="4" fill="#FBBF24"/>
-                        <!-- Legs under table -->
-                        <rect x="134" y="247" width="6" height="25" rx="3" fill="#1e293b"/>
-                        <rect x="142" y="247" width="6" height="25" rx="3" fill="#1e293b"/>
+                        <!-- Coffee cup -->
+                        <g>
+                            <ellipse cx="195" cy="268" rx="5" ry="2" fill="#A78BFA"/>
+                            <path d="M 190 268 L 190 276 Q 190 278 192.5 278 L 197.5 278 Q 200 278 200 276 L 200 268" fill="#8B5CF6" stroke="#7C3AED" stroke-width="1"/>
+                            <!-- Steam animation -->
+                            <path d="M 192 264 Q 192 260 194 258" stroke="rgba(255,255,255,0.6)" stroke-width="1" fill="none" stroke-linecap="round">
+                                <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M 198 264 Q 198 260 196 258" stroke="rgba(255,255,255,0.6)" stroke-width="1" fill="none" stroke-linecap="round">
+                                <animate attributeName="opacity" values="0;0.6;0" dur="2s" repeatCount="indefinite"/>
+                            </path>
+                        </g>
 
-                        <!-- Person 4 (Bottom Center-Right) - Sitting, speaking -->
-                        <!-- Head -->
-                        <circle cx="260" cy="180" r="20" fill="#FB7185"/>
-                        <circle cx="253" cy="176" r="2.5" fill="#1e1e1e"/>
-                        <circle cx="267" cy="176" r="2.5" fill="#1e1e1e"/>
-                        <path d="M 253 185 Q 260 189 267 185" stroke="#1e1e1e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                        <!-- Open mouth (speaking) -->
-                        <ellipse cx="260" cy="191" rx="3" ry="4" fill="#1e1e1e"/>
-                        <!-- Body (seated) -->
-                        <rect x="248" y="202" width="24" height="45" rx="12" fill="#10B981"/>
-                        <!-- Arms gesturing -->
-                        <path d="M 245 215 Q 225 210 215 200" stroke="#FB7185" stroke-width="9" stroke-linecap="round" opacity="0.9"/>
-                        <rect x="248" y="210" width="10" height="7" rx="3" fill="#FB7185"/>
-                        <!-- Legs under table -->
-                        <rect x="254" y="247" width="6" height="25" rx="3" fill="#1e293b"/>
-                        <rect x="262" y="247" width="6" height="25" rx="3" fill="#1e293b"/>
+                        <!-- Person 1 (Left) - Developer with laptop -->
+                        <g>
+                            <!-- Head -->
+                            <circle cx="100" cy="180" r="24" fill="#FCD34D">
+                                <animate attributeName="cy" values="180;178;180" dur="4s" repeatCount="indefinite"/>
+                            </circle>
+                            <!-- Hair -->
+                            <path d="M 85 170 Q 100 160 115 170" fill="#78350F" opacity="0.8"/>
+                            <!-- Eyes -->
+                            <circle cx="93" cy="178" r="2.5" fill="#1e1e1e"/>
+                            <circle cx="107" cy="178" r="2.5" fill="#1e1e1e"/>
+                            <!-- Smile -->
+                            <path d="M 93 188 Q 100 192 107 188" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <!-- Body -->
+                            <rect x="85" y="205" width="30" height="55" rx="15" fill="#3B82F6">
+                                <animate attributeName="y" values="205;203;205" dur="4s" repeatCount="indefinite"/>
+                            </rect>
+                            <!-- Left arm (typing) -->
+                            <path d="M 85 220 Q 70 225 65 235" stroke="#FCD34D" stroke-width="11" stroke-linecap="round">
+                                <animate attributeName="d" values="M 85 220 Q 70 225 65 235; M 85 220 Q 70 223 65 233; M 85 220 Q 70 225 65 235" dur="1s" repeatCount="indefinite"/>
+                            </path>
+                            <!-- Right arm (typing) -->
+                            <path d="M 115 220 Q 130 225 135 235" stroke="#FCD34D" stroke-width="11" stroke-linecap="round">
+                                <animate attributeName="d" values="M 115 220 Q 130 225 135 235; M 115 220 Q 130 223 135 233; M 115 220 Q 130 225 135 235" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+                            </path>
+                            <!-- Legs -->
+                            <rect x="92" y="260" width="7" height="30" rx="3" fill="#1e293b"/>
+                            <rect x="101" y="260" width="7" height="30" rx="3" fill="#1e293b"/>
+                        </g>
 
-                        <!-- Laptops on table -->
-                        <rect x="155" y="255" width="20" height="12" rx="2" fill="#374151" opacity="0.7"/>
-                        <rect x="225" y="255" width="20" height="12" rx="2" fill="#374151" opacity="0.7"/>
+                        <!-- Person 2 (Center) - Manager presenting -->
+                        <g>
+                            <!-- Head -->
+                            <circle cx="200" cy="160" r="26" fill="#F59E0B">
+                                <animate attributeName="cy" values="160;158;160" dur="3s" repeatCount="indefinite"/>
+                            </circle>
+                            <!-- Hair -->
+                            <ellipse cx="200" cy="150" rx="20" ry="12" fill="#92400E"/>
+                            <!-- Eyes -->
+                            <circle cx="192" cy="158" r="3" fill="#1e1e1e"/>
+                            <circle cx="208" cy="158" r="3" fill="#1e1e1e"/>
+                            <!-- Smile -->
+                            <path d="M 190 168 Q 200 173 210 168" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <!-- Body -->
+                            <rect x="182" y="187" width="36" height="60" rx="18" fill="#8B5CF6">
+                                <animate attributeName="y" values="187;185;187" dur="3s" repeatCount="indefinite"/>
+                            </rect>
+                            <!-- Left arm (pointing) -->
+                            <path d="M 182 205 Q 160 200 145 185" stroke="#F59E0B" stroke-width="12" stroke-linecap="round">
+                                <animate attributeName="d" values="M 182 205 Q 160 200 145 185; M 182 205 Q 160 195 140 180; M 182 205 Q 160 200 145 185" dur="2s" repeatCount="indefinite"/>
+                            </path>
+                            <!-- Right arm (gesturing) -->
+                            <path d="M 218 205 Q 240 200 255 185" stroke="#F59E0B" stroke-width="12" stroke-linecap="round">
+                                <animate attributeName="d" values="M 218 205 Q 240 200 255 185; M 218 205 Q 240 195 260 180; M 218 205 Q 240 200 255 185" dur="2s" repeatCount="indefinite" begin="1s"/>
+                            </path>
+                            <!-- Legs -->
+                            <rect x="192" y="247" width="7" height="35" rx="3" fill="#1e293b"/>
+                            <rect x="201" y="247" width="7" height="35" rx="3" fill="#1e293b"/>
+                        </g>
 
-                        <!-- Chat bubbles showing communication -->
-                        <!-- Bubble 1 (Person 1) -->
-                        <ellipse cx="50" cy="130" rx="25" ry="16" fill="rgba(255,255,255,0.95)"/>
-                        <polygon points="45,145 35,155 48,148" fill="rgba(255,255,255,0.95)"/>
-                        <circle cx="45" cy="130" r="2" fill="#667eea"/>
-                        <circle cx="55" cy="130" r="2" fill="#667eea"/>
-                        <circle cx="65" cy="130" r="2" fill="#667eea"/>
+                        <!-- Person 3 (Right) - Designer with tablet -->
+                        <g>
+                            <!-- Head -->
+                            <circle cx="300" cy="185" r="23" fill="#EC4899">
+                                <animate attributeName="cy" values="185;183;185" dur="3.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <!-- Hair (ponytail) -->
+                            <circle cx="315" cy="180" r="8" fill="#9D174D"/>
+                            <ellipse cx="300" cy="175" rx="18" ry="10" fill="#9D174D"/>
+                            <!-- Eyes -->
+                            <circle cx="293" cy="183" r="2.5" fill="#1e1e1e"/>
+                            <circle cx="307" cy="183" r="2.5" fill="#1e1e1e"/>
+                            <!-- Smile -->
+                            <path d="M 293 192 Q 300 195 307 192" stroke="#1e1e1e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <!-- Body -->
+                            <rect x="285" y="210" width="30" height="52" rx="15" fill="#10B981">
+                                <animate attributeName="y" values="210;208;210" dur="3.5s" repeatCount="indefinite"/>
+                            </rect>
+                            <!-- Left arm (holding tablet) -->
+                            <path d="M 285 225 Q 270 230 265 235" stroke="#EC4899" stroke-width="10" stroke-linecap="round"/>
+                            <!-- Tablet -->
+                            <rect x="255" y="230" width="25" height="18" rx="2" fill="#60A5FA" stroke="#3B82F6" stroke-width="1.5"/>
+                            <!-- Right arm (touching tablet) -->
+                            <path d="M 315 225 Q 295 235 280 240" stroke="#EC4899" stroke-width="10" stroke-linecap="round">
+                                <animate attributeName="d" values="M 315 225 Q 295 235 280 240; M 315 225 Q 295 233 278 238; M 315 225 Q 295 235 280 240" dur="1.5s" repeatCount="indefinite"/>
+                            </path>
+                            <!-- Legs -->
+                            <rect x="292" y="262" width="7" height="28" rx="3" fill="#1e293b"/>
+                            <rect x="301" y="262" width="7" height="28" rx="3" fill="#1e293b"/>
+                        </g>
 
-                        <!-- Bubble 2 (Person 2) -->
-                        <ellipse cx="360" cy="85" rx="25" ry="16" fill="rgba(255,255,255,0.95)"/>
-                        <polygon points="375,95 385,75 370,88" fill="rgba(255,255,255,0.95)"/>
-                        <circle cx="355" cy="85" r="2" fill="#667eea"/>
-                        <circle cx="365" cy="85" r="2" fill="#667eea"/>
+                        <!-- Floating notification icons -->
+                        <g>
+                            <!-- Bell notification -->
+                            <g transform="translate(50, 100)">
+                                <circle cx="0" cy="0" r="12" fill="#EF4444" opacity="0.9">
+                                    <animate attributeName="cy" values="0;-5;0" dur="2s" repeatCount="indefinite"/>
+                                </circle>
+                                <path d="M -4 -2 Q 0 -6 4 -2 L 4 2 Q 4 4 2 4 L -2 4 Q -4 4 -4 2 Z" fill="white"/>
+                                <circle cx="0" cy="5" r="1" fill="white"/>
+                            </g>
 
-                        <!-- Decorative elements -->
-                        <circle cx="50" cy="340" r="14" fill="rgba(255,255,255,0.9)"/>
-                        <path d="M 45 335 L 50 340 L 55 335" stroke="#667eea" stroke-width="2" fill="none" stroke-linecap="round"/>
-                        <line x1="45" y1="345" x2="55" y2="345" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                            <!-- Message notification -->
+                            <g transform="translate(350, 200)">
+                                <circle cx="0" cy="0" r="12" fill="#3B82F6" opacity="0.9">
+                                    <animate attributeName="cy" values="0;-5;0" dur="2.5s" repeatCount="indefinite"/>
+                                </circle>
+                                <rect x="-5" y="-3" width="10" height="6" rx="1" fill="white"/>
+                                <path d="M -5 -3 L 0 1 L 5 -3" stroke="white" stroke-width="1" fill="none"/>
+                            </g>
 
-                        <!-- Success indicator -->
-                        <circle cx="360" cy="350" r="16" fill="#10B981" opacity="0.8"/>
-                        <path d="M 355 350 L 360 355 L 368 345" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Check mark -->
+                            <g transform="translate(140, 120)">
+                                <circle cx="0" cy="0" r="10" fill="#10B981" opacity="0.9">
+                                    <animate attributeName="cy" values="0;-4;0" dur="3s" repeatCount="indefinite"/>
+                                </circle>
+                                <path d="M -3 0 L -1 2 L 3 -2" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                        </g>
+
+                        <!-- Connection lines between people (animated) -->
+                        <g opacity="0.3">
+                            <line x1="100" y1="200" x2="200" y2="180" stroke="white" stroke-width="2" stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="200" y1="180" x2="300" y2="200" stroke="white" stroke-width="2" stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s" repeatCount="indefinite"/>
+                            </line>
+                        </g>
+
+                        <!-- Text bubbles with animation -->
+                        <g>
+                            <!-- Bubble 1 -->
+                            <ellipse cx="60" cy="160" rx="28" ry="18" fill="rgba(255,255,255,0.95)">
+                                <animate attributeName="ry" values="18;20;18" dur="2s" repeatCount="indefinite"/>
+                            </ellipse>
+                            <polygon points="50,175 42,185 55,178" fill="rgba(255,255,255,0.95)"/>
+                            <text x="60" y="165" font-size="20" fill="#667eea" text-anchor="middle">💡</text>
+
+                            <!-- Bubble 2 -->
+                            <ellipse cx="340" cy="170" rx="28" ry="18" fill="rgba(255,255,255,0.95)">
+                                <animate attributeName="ry" values="18;20;18" dur="2.5s" repeatCount="indefinite"/>
+                            </ellipse>
+                            <polygon points="350,185 358,195 345,188" fill="rgba(255,255,255,0.95)"/>
+                            <text x="340" y="175" font-size="20" fill="#667eea" text-anchor="middle">✓</text>
+
+                            <!-- Bubble 3 -->
+                            <ellipse cx="200" cy="120" rx="30" ry="18" fill="rgba(255,255,255,0.95)">
+                                <animate attributeName="ry" values="18;20;18" dur="3s" repeatCount="indefinite"/>
+                            </ellipse>
+                            <polygon points="195,135 190,145 200,138" fill="rgba(255,255,255,0.95)"/>
+                            <text x="200" y="126" font-size="20" fill="#667eea" text-anchor="middle">🎯</text>
+                        </g>
+
+                        <!-- Success indicator (animated) -->
+                        <g transform="translate(360, 340)">
+                            <circle cx="0" cy="0" r="18" fill="#10B981" opacity="0.9">
+                                <animate attributeName="r" values="18;20;18" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <path d="M -6 0 L -2 4 L 6 -4" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <animate attributeName="stroke-dasharray" values="0,100;100,0" dur="2s" repeatCount="indefinite"/>
+                            </path>
+                        </g>
                     </svg>
                 </div>
             </div>
@@ -512,11 +667,28 @@
                 <p>Enter your credentials to continue</p>
             </div>
 
-            <!-- Alert Container -->
-            <div id="alert-container"></div>
+            <!-- Session Status -->
+            @if (session('status'))
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <!-- Validation Errors -->
+            @if ($errors->any())
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>
+                        @foreach ($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <!-- Google Login Button -->
-            <a href="{{ route('auth.google') }}" class="google-login-btn">
+            <a href="#" class="google-login-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -535,15 +707,20 @@
                 @csrf
 
                 <div class="form-group">
-                    <label for="login" class="form-label">Email or Username</label>
+                    <label for="email" class="form-label">Email</label>
                     <input
-                        id="login"
-                        name="login"
-                        type="text"
+                        id="email"
+                        name="email"
+                        type="email"
                         required
-                        value="{{ old('login') }}"
-                        class="form-input"
+                        autofocus
+                        autocomplete="username"
+                        value="{{ old('email') }}"
+                        class="form-input @error('email') input-error @enderror"
                         placeholder="example@email.com">
+                    @error('email')
+                        <div class="error-message">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="form-group">
@@ -554,18 +731,32 @@
                             name="password"
                             type="password"
                             required
-                            class="form-input"
+                            autocomplete="current-password"
+                            class="form-input @error('password') input-error @enderror"
                             placeholder="••••••••">
                         <button type="button" class="password-toggle" onclick="togglePassword()">
                             <i class="fas fa-eye" id="password-eye"></i>
                         </button>
                     </div>
-                    <div class="forgot-password">
-                        <a href="{{ route('password.request') }}">
-                            <span>Forgot password?</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                    @error('password')
+                        <div class="error-message">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-footer">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember" id="remember_me">
+                        <span>Remember me</span>
+                    </label>
+
+                    @if (Route::has('password.request'))
+                        <div class="forgot-password">
+                            <a href="{{ route('password.request') }}">
+                                <span>Forgot password?</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    @endif
                 </div>
 
                 <button type="submit" class="login-btn">
@@ -573,10 +764,12 @@
                 </button>
             </form>
 
-            <div class="register-section">
-                Don't have an account?
-                <a href="{{ route('register') }}">Register now</a>
-            </div>
+            @if (Route::has('register'))
+                <div class="register-section">
+                    Don't have an account?
+                    <a href="{{ route('register') }}">Register now</a>
+                </div>
+            @endif
 
             <div class="social-icons">
                 <a href="#" class="social-icon" title="Facebook">

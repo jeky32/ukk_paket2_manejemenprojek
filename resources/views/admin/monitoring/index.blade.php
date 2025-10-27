@@ -9,7 +9,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Projects</p>
-                    <p class="text-2xl font-semibold text-gray-800">{{ $projectStats['total'] }}</p>
+                    <p class="text-2xl font-semibold text-gray-800">{{ $projectStats['total'] ?? 0 }}</p>
                 </div>
                 <div class="p-3 bg-blue-100 rounded-full">
                     <i class="fas fa-project-diagram text-blue-600 text-xl"></i>
@@ -22,7 +22,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">With Deadline</p>
-                    <p class="text-2xl font-semibold text-gray-800">{{ $projectStats['with_deadline'] }}</p>
+                    <p class="text-2xl font-semibold text-gray-800">{{ $projectStats['with_deadline'] ?? 0 }}</p>
                 </div>
                 <div class="p-3 bg-green-100 rounded-full">
                     <i class="fas fa-calendar-check text-green-600 text-xl"></i>
@@ -35,7 +35,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Deadline Soon</p>
-                    <p class="text-2xl font-semibold text-orange-600">{{ $projectStats['deadline_approaching'] }}</p>
+                    <p class="text-2xl font-semibold text-orange-600">{{ $projectStats['deadline_approaching'] ?? 0 }}</p>
                 </div>
                 <div class="p-3 bg-orange-100 rounded-full">
                     <i class="fas fa-clock text-orange-600 text-xl"></i>
@@ -48,7 +48,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Overdue</p>
-                    <p class="text-2xl font-semibold text-red-600">{{ $projectStats['overdue'] }}</p>
+                    <p class="text-2xl font-semibold text-red-600">{{ $projectStats['overdue'] ?? 0 }}</p>
                 </div>
                 <div class="p-3 bg-red-100 rounded-full">
                     <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
@@ -64,11 +64,11 @@
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-yellow-50 rounded-lg p-4">
                     <p class="text-sm font-medium text-gray-600">Working</p>
-                    <p class="text-2xl font-semibold text-yellow-600">{{ $workingUsers }}</p>
+                    <p class="text-2xl font-semibold text-yellow-600">{{ $workingUsers ?? 0 }}</p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-4">
                     <p class="text-sm font-medium text-gray-600">Idle</p>
-                    <p class="text-2xl font-semibold text-gray-600">{{ $idleUsers }}</p>
+                    <p class="text-2xl font-semibold text-gray-600">{{ $idleUsers ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -76,17 +76,23 @@
         <div class="bg-white rounded-lg shadow-md p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Member Distribution</h3>
             <div class="space-y-4">
-                @foreach($memberDistribution as $project => $count)
+                @forelse($memberDistribution ?? [] as $project => $count)
                     <div>
                         <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">{{ $project }}</span>
+                            <span class="text-gray-600">{{ Str::limit($project, 20) }}</span>
                             <span class="text-gray-800 font-medium">{{ $count }} members</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ ($count / ($workingUsers + $idleUsers)) * 100 }}%"></div>
+                            @php
+                                $totalMembers = array_sum($memberDistribution);
+                                $percentage = $totalMembers > 0 ? ($count / $totalMembers) * 100 : 0;
+                            @endphp
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $percentage }}%"></div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <p class="text-gray-500 text-center py-4">No member distribution data</p>
+                @endforelse
             </div>
         </div>
     </div>
@@ -108,17 +114,19 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($projects as $project)
+                    @forelse($projects ?? [] as $project)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ $project->project_name }}</div>
-                                <div class="text-sm text-gray-500">Created by {{ $project->creator->full_name }}</div>
+                                <div class="text-sm text-gray-500">
+                                    Created by {{ $project->creator->full_name ?? $project->creator->username ?? 'Unknown' }}
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex -space-x-2">
                                     @foreach($project->members->take(3) as $member)
                                         <div class="h-8 w-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs font-medium">
-                                            {{ strtoupper(substr($member->user->full_name, 0, 2)) }}
+                                            {{ strtoupper(substr($member->full_name ?? $member->username ?? 'U', 0, 2)) }}
                                         </div>
                                     @endforeach
                                     @if($project->members->count() > 3)
@@ -164,12 +172,18 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.monitoring.project-details', $project->project_id) }}" class="text-blue-600 hover:text-blue-900">
+                                <a href="{{ route('admin.monitoring.show', $project->project_id ?? $project->id) }}" class="text-blue-600 hover:text-blue-900">
                                     View Details
                                 </a>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                No projects found
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Card extends Model
 {
-    protected $primaryKey = 'card_id';
+    protected $primaryKey = 'id';
     public $timestamps = false;
 
     protected $fillable = [
@@ -24,7 +24,7 @@ class Card extends Model
     {
         return $this->belongsTo(Board::class, 'board_id');
     }
-   
+
     public function subtasks()
     {
        return $this->hasMany(Subtask::class, 'card_id', 'card_id');
